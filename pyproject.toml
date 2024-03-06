@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "prva"
+version = "0.1.0"
+description = "Prva naloga IIS"
+authors = ["Mitja <mitja.cesar1@student.um.si>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
