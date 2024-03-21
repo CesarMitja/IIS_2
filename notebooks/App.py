@@ -10,23 +10,20 @@ scaler = joblib.load('C:/Users/mitja/Desktop/inžinirstvo/Prva naloga/models/sca
 
 app = Flask(__name__)
 
-@app.route('/mbajk/predict/', methods=['POST'])
-def predict():
-    data = request.json
-    # Predvidevamo, da bo vhodni podatek vseboval 'last_update' in 'available_bike_stands'
-    df = pd.DataFrame([data])
-    df['last_update'] = pd.to_datetime(df['last_update'])
-    df.set_index('last_update', inplace=True)
+@app.route('/napoved/mbajk', methods=['POST'])
+def napoved_naloga6():
+    data = request.get_json()
+    timeseries = data.get('timeseries')
 
-    # Predpriprava podatkov
-    input_data = scaler.transform(df[['available_bike_stands']])
-    input_data = input_data.reshape(-1, 1, 1)  # Prilagoditev oblike za LSTM
+    if len(timeseries) < 186:
+        return jsonify({'error': 'Invalid timeseries length (too short). Expected 186 data points'}), 400
+    if len(timeseries) > 186:
+        return jsonify({'error': 'Invalid timeseries length (too long). Expected 186 data points'}), 400
 
-    # Napoved
-    prediction = model.predict(input_data)
-    prediction = scaler.inverse_transform(prediction)  # Vrnitev napovedi v prvotno lestvico
-
-    return jsonify({"prediction": int(prediction[0][0])})
+    timeseries_reshaped = np.array([timeseries]).reshape(1, 1, 186)
+    prediction = model.predict(timeseries_reshaped)
+    prediction_descaled = scaler.inverse_transform(prediction.reshape(-1, 1))
+    return jsonify({'prediction': prediction_descaled.tolist()})
 
 if __name__ == '__main__':
     app.run(debug=True)
