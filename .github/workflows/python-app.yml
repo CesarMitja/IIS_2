@@ -14,6 +14,6 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        pip install poetry
+        pip install poetry pytest 
     - name: Test with pytest
       run: pytest
