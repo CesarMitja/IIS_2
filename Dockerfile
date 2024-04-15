@@ -8,9 +8,8 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock* /app/
 
 # Namesti 'poetry' in odvisnosti projekta
-RUN pip install poetry
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev
+RUN pip install Flask tensorflow pandas joblib numpy
+
 
 # Kopiraj vse aplikacijske datoteke v kontejner
 COPY . /app
