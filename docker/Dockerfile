@@ -6,7 +6,7 @@ RUN pip install --no-cache-dir flask numpy scikit-learn joblib tensorflow pandas
 
 COPY . .
 
-ENV FLASK_APP=notebooks/App.py
+ENV FLASK_APP=App.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 EXPOSE 5000

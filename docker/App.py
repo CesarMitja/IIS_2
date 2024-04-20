@@ -17,8 +17,6 @@ scaler_path = os.path.join(current_directory, 'scaler6.pkl')
 #scaler = joblib.load('C:/Users/mitja/Desktop/inžinirstvo/Prva naloga/models/scaler6.pkl')
 #model = tf.keras.models.load_model(model_path)
 
-
-
 model = load_model(model_path)
 scaler = joblib.load(scaler_path)
 app = Flask(__name__)
