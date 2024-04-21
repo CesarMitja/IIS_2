@@ -1,7 +1,11 @@
-name: Python application test
+name: Python app yml
 
-on: [push]
-
+on:
+  schedule:
+    - cron: '0 * * * *'  # Izvedi vsako uro ob 0. minuti
+  push:
+    branches:
+      - main  # ali katerikoli veji uporabljate
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,6 +18,41 @@ jobs:
         python-version: 3.9
     - name: Install dependencies
       run: |
-        pip install poetry pytest flask pandas torch flask_cors joblib joblib scikit-learn numpy
+        pip install pytest flask pandas torch flask_cors joblib scikit-learn numpy
     - name: Test with pytest
       run: pytest
+
+    fetch-and-process-data:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # ali katerakoli različica, ki jo uporabljate
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest flask pandas torch flask_cors joblib scikit-learn numpy
+
+      - name: Fetch data
+        run: python src/data/Fetch_data.py
+
+      - name: Process data
+        run: python src/data/Process_data.py
+
+  build-and-run-docker:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build and run Docker containers
+        run: |
+          docker-compose up -d
+          docker-compose down

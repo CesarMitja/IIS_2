@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  web_service:
+    build: 
+      context: ./src
+      dockerfile: Dockerfile
+    image: cesi212314/web_service_iis:latest  
+    ports:
+      - "8000:8000"
+
+  user_interface:
+    build: 
+      context: ./src/client
+      dockerfile: Dockerfile
+    image: cesi212314/user_interface_iis:latest  
+    ports:
+      - "3000:3000"
+
+  
