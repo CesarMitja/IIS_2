@@ -13,15 +13,15 @@ weather_data = pd.read_csv(WEATHER_DATA_FILE, parse_dates=['time'])
 # Refine weather data: rename columns for clarity and select necessary ones
 weather_columns_rename = {
     'temperature_2m': 'temperature',
-    'relative_humidity_2m': 'humidity',
+    'relative_humidity_2m': 'relative_humidity',
     'dew_point_2m': 'dew_point',
-    'apparent_temperature': 'apparent_temp',
-    'precipitation_probability': 'precip_prob',
+    'apparent_temperature': 'apparent_temperature',
+    'precipitation_probability': 'precipitation_probability',
     'rain': 'rain',
-    'surface_pressure': 'pressure'
+    'surface_pressure': 'surface_pressure'
 }
 weather_data.rename(columns=weather_columns_rename, inplace=True)
-weather_data = weather_data[['time', 'temperature', 'humidity', 'dew_point', 'apparent_temp', 'precip_prob', 'rain', 'pressure']]
+weather_data = weather_data[['time', 'temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 'precipitation_probability', 'rain', 'surface_pressure']]
 
 # Align time columns in both datasets to the nearest hour
 bike_data['last_update'] = bike_data['last_update'].dt.round('H')
@@ -39,8 +39,8 @@ combined_data = pd.merge_asof(
 bike_data['last_update'].rename('date')
 
 # Prepare the final DataFrame
-combined_data = combined_data[['date','temperature', 'humidity', 'dew_point', 'apparent_temp',
-            'precip_prob', 'rain', 'pressure', 'bike_stands', 'available_bike_stands']]
+combined_data = combined_data[['date','temperature', 'relative_humidity', 'dew_point', 'apparent_temperature',
+            'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']]
 
 combined_data.rename(columns={'last_update': 'timestamp'}, inplace=True)
 

@@ -1,4 +1,4 @@
-date,temperature,humidity,dew_point,apparent_temp,precip_prob,rain,pressure,bike_stands,available_bike_stands
+date,temperature,relative_humidity,dew_point,apparent_temperature,precipitation_probability,rain,surface_pressure,bike_stands,available_bike_stands
 2024-04-11 02:00:00+00:00,8.5,75,4.3,6.6,0,0.0,998.8,22,4
 2024-04-11 03:00:00+00:00,8.5,73,3.9,6.3,0,0.0,998.8,22,4
 2024-04-11 04:00:00+00:00,9.2,70,4.0,7.1,0,0.0,998.9,22,6
