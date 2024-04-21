@@ -12,16 +12,11 @@ def client():
         yield client
 
 def test_predict_success(client):
-    sample_data = {
-    }
-    response = client.post('/predict', data=json.dumps(sample_data), content_type='application/json')
+    response = client.post('/predict', content_type='application/json')
     data = json.loads(response.text)
     assert len(data) > 0
 
 def test_predict_failure(client):
-    # Test z nepravilnimi podatki, ki ne vsebujejo zahtevanih polj
-    wrong_data = {
-    }
-    response = client.post('/predict', data=json.dumps(wrong_data), content_type='application/json')
+    response = client.post('/predict', content_type='application/json')
     assert response.status_code == 200
     data = json.loads(response.data)
