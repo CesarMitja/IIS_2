@@ -2,7 +2,7 @@ version: '3.8'
 services:
   web_service:
     build: 
-      context: ./src
+      context: ./
       dockerfile: Dockerfile
     image: cesi212314/web_service_iis:latest  
     ports:
