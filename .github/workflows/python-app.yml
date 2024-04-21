@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./src/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: cesi212314/web_service_iis:latest
           
