@@ -1,14 +1,7 @@
 import pytest
 import os
 from flask import json
-
-import app
-base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-model_path = os.path.join(base_dir, 'src','serve', 'Predict_service.py')
-app.path.insert(0, model_path)
-
-
-
+from src.serve.Predict_service import app 
 
 @pytest.fixture
 def client():
