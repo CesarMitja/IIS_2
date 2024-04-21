@@ -1,6 +1,0 @@
-__pycache__/
-.env
-*.pyc
-.DS_Store  # If you're on macOS
-.vscode/  # If you're using Visual Studio Code
-venv/  # If you're using a virtual environment
