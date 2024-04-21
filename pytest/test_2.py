@@ -1,7 +1,9 @@
 import pytest
 import os
 from flask import json
-from src.serve.Predict_service import app 
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.serve.Predict_service import app
 
 @pytest.fixture
 def client():
