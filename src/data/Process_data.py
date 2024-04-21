@@ -36,11 +36,12 @@ combined_data = pd.merge_asof(
     direction='nearest'
 )
 
+bike_data['last_update'].rename('date')
+
 # Prepare the final DataFrame
-combined_data = combined_data[[
-    'last_update', 'temperature', 'humidity', 'dew_point', 'apparent_temp', 
-    'precip_prob', 'rain', 'pressure', 'bike_stands', 'available_bike_stands'
-]]
+combined_data = combined_data[['date','temperature', 'humidity', 'dew_point', 'apparent_temp',
+            'precip_prob', 'rain', 'pressure', 'bike_stands', 'available_bike_stands']]
+
 combined_data.rename(columns={'last_update': 'timestamp'}, inplace=True)
 
 # Set timestamp to UTC timezone
