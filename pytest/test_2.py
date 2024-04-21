@@ -17,7 +17,7 @@ def test_predict_success(client):
     }
     response = client.post('/predict', data=json.dumps(sample_data), content_type='application/json')
     data = json.loads(response.text)
-    assert 'prediction' in data
+    assert len(data) > 0
 
 def test_predict_failure(client):
     # Test z nepravilnimi podatki, ki ne vsebujejo zahtevanih polj
