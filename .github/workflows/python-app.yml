@@ -23,7 +23,7 @@ jobs:
         run: pytest
 
   fetch-and-process-data:
-    if: github.event_name == 'push'
+    if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
