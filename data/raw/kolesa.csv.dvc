@@ -1,0 +1,5 @@
+outs:
+- md5: e6bdaea4dbc3849a0a9d79e0bb64c898
+  size: 75135
+  hash: md5
+  path: kolesa.csv
