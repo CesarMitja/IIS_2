@@ -19,6 +19,14 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+          pip install dvc dvc[s3]
+      - name: Configure DVC Remote and pull
+        run: |
+          dvc remote add origin s3://dvc -f
+          dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.DVC_ACCESS_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+          dvc pull --force
       - name: Test with pytest
         run: pytest
 
