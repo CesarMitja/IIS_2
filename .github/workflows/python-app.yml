@@ -40,6 +40,14 @@ jobs:
         run: python src/data/Fetch_data.py
       - name: Process data
         run: python src/data/Process_data.py
+        
+      - name: Configure DVC Remote and pull
+        if: steps.tests.outcome == 'success'
+        run: |
+          dvc remote add origin s3://dvc -f
+          dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.DVC_ACCESS_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{ secrets.DVC_SECRET_ACCESS_KEY }}
 
       - name: Setup git
         run: |
@@ -57,7 +65,7 @@ jobs:
           git commit -m "Update data" -a || echo "No changes to commit"
           git push
           dvc push
-          
+
   build-and-run-docker:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
