@@ -42,7 +42,6 @@ jobs:
         run: python src/data/Process_data.py
 
       - name: Configure DVC Remote and pull
-        if: steps.tests.outcome == 'success'
         run: |
           dvc remote add origin s3://dvc -f
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
@@ -55,15 +54,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Track data with DVC
+
+      - name: Setup auto stage and add data with DVC
         run: |
+          dvc config core.autostage true
           dvc add data/raw/kolesa.csv
           dvc add data/raw/vreme.csv
           dvc add data/processed/data_for_prediction.csv
-          dvc push
-
-      - name: Add and commit data
-        run: |
           git add .
           git commit -m "Update data" -a || echo "No changes to commit"
           git push
