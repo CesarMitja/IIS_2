@@ -47,7 +47,7 @@ jobs:
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
           dvc remote modify origin --local access_key_id ${{ secrets.DVC_ACCESS_KEY_ID }}
           dvc remote modify origin --local secret_access_key ${{ secrets.DVC_SECRET_ACCESS_KEY }}
-          dvc pull
+          dvc pull --force
           
       - name: Setup git
         run: |
