@@ -42,15 +42,15 @@ jobs:
         run: python src/data/Process_data.py
 
       - name: Setup git
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
 
-    - name: Add and commit data
-      run: |
-        git add .
-        git commit -m "Update data" -a || echo "No changes to commit"
-        git push
+      - name: Add and commit data
+        run: |
+          git add .
+          git commit -m "Update data" -a || echo "No changes to commit"
+          git push
 
   build-and-run-docker:
     if: github.event_name == 'push'
