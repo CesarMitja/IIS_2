@@ -46,12 +46,18 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
+      - name: Track data with DVC
+        run: |
+          dvc add data/raw data/processed
+          dvc push
+
       - name: Add and commit data
         run: |
           git add .
           git commit -m "Update data" -a || echo "No changes to commit"
           git push
-
+          dvc push
+          
   build-and-run-docker:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
