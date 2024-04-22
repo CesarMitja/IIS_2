@@ -23,7 +23,7 @@ jobs:
         run: pytest
 
   fetch-and-process-data:
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -40,6 +40,17 @@ jobs:
         run: python src/data/Fetch_data.py
       - name: Process data
         run: python src/data/Process_data.py
+
+      - name: Setup git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Add and commit data
+      run: |
+        git add .
+        git commit -m "Update data" -a || echo "No changes to commit"
+        git push
 
   build-and-run-docker:
     if: github.event_name == 'push'
