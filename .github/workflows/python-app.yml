@@ -56,7 +56,9 @@ jobs:
 
       - name: Track data with DVC
         run: |
-          dvc add data/raw data/processed
+          dvc add data/raw/kolesa.csv
+          dvc add data/raw/vreme.csv
+          dvc add data/processed/data_for_prediction.csv
           dvc push
 
       - name: Add and commit data
