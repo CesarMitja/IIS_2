@@ -86,7 +86,7 @@ jobs:
           dvc push -r origin data/raw/kolesa.csv
           dvc add data/processed/data_for_prediction.csv
           dvc push -r origin data/processed/data_for_prediction.csv
-          git add .dvc/config data/*.dvc
+          git add .dvc/config data/*.dvc data/processed/*.csv data/raw/*.csv reports
           git add .
           git commit -m "Update data" -a || echo "No changes to commit"
           git push
