@@ -31,7 +31,7 @@ jobs:
         run: pytest
 
   fetch-and-process-data:
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -55,7 +55,7 @@ jobs:
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
           dvc remote modify origin --local access_key_id ${{ secrets.DVC_ACCESS_KEY_ID }}
           dvc remote modify origin --local secret_access_key ${{ secrets.DVC_SECRET_ACCESS_KEY }}
-          dvc pull --force
+          
           
       - name: Setup git
         run: |
