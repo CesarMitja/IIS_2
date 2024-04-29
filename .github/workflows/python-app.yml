@@ -57,8 +57,6 @@ jobs:
         run: python src/data/Fetch_data.py
       - name: Process data
         run: python src/data/Process_data.py
-
-      
           
       - name: Setup git
         run: |
