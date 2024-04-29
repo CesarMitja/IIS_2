@@ -13,6 +13,12 @@ WEATHER_PARAMS = {
     'hourly': 'temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,rain,surface_pressure'
 }
 
+def get_line_count(file_path):
+    if file_path.exists():
+        return sum(1 for line in open(file_path))
+    else:
+        return 0
+
 def fetch_weather():
     now = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
     next_hour = now + timedelta(hours=1)
@@ -52,10 +58,26 @@ def fetch_and_store_bike_data():
 
 def main():
     RAW_DATA_PATH.mkdir(parents=True, exist_ok=True)
+
+    # Count existing lines
+    vreme_path = RAW_DATA_PATH / 'vreme.csv'
+    kolesa_path = RAW_DATA_PATH / 'kolesa.csv'
+    initial_vreme_lines = get_line_count(vreme_path)
+    initial_kolesa_lines = get_line_count(kolesa_path)
+
+    # Fetch and store data
     weather_data = fetch_weather()
     store_weather_data(weather_data)
     fetch_and_store_bike_data()
-    print(f"Data saved to vreme and kolesa.csv.")
+
+    # Check lines after update
+    final_vreme_lines = get_line_count(vreme_path)
+    final_kolesa_lines = get_line_count(kolesa_path)
+
+    if final_vreme_lines == initial_vreme_lines + 1 and final_kolesa_lines == initial_kolesa_lines + 1:
+        print("New entry in CSV.")
+    else:
+        print("Something wrong with fetch.")
 
 if __name__ == "__main__":
     main()
