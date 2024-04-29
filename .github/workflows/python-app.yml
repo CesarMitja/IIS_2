@@ -51,6 +51,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
       - name: Configure DVC Remote and pull
+        id: config
         run: |
           dvc remote add origin s3://dvc -f
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
@@ -59,18 +60,24 @@ jobs:
           dvc pull -f
 
       - name: Fetch data
+        id: fetch
+        if: steps.config.outcome == 'success'
         run: 
           python src/data/Fetch_data.py
           dvc add data/raw/kolesa.csv
           dvc add data/raw/vreme.csv
           dvc push -r origin data/raw/vreme.csv
           dvc push -r origin data/raw/kolesa.csv
+          
       - name: Process data
+        id: proc
+        if: steps.fetch.outcome == 'success'
         run: 
           python src/data/Process_data.py
           dvc add data/processed/data_for_prediction.csv
           dvc push -r origin data/processed/data_for_prediction.csv
       - name: Add data with GIT
+        if: steps.proc.outcome == 'success'
         run: |
           git add .
           git commit -m "Update data" -a || echo "No changes to commit"
