@@ -76,6 +76,7 @@ def main():
 
     if final_vreme_lines == initial_vreme_lines + 1 and final_kolesa_lines == initial_kolesa_lines + 1:
         print("New entry in CSV.")
+        print("Bravo")
     else:
         print("Something wrong with fetch.")
 
