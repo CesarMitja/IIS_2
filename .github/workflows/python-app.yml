@@ -63,7 +63,7 @@ jobs:
         run: python src/data/Process_data.py
 
 
-      - name: Setup auto stage and add data with DVC
+      - name: Add data with DVC and GIT
         run: |
           dvc add data/raw/kolesa.csv
           dvc add data/raw/vreme.csv
