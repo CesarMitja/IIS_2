@@ -54,8 +54,8 @@ jobs:
         run: |
           dvc remote add origin s3://dvc -f
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
-          dvc remote modify origin --local access_key_id ${{ secrets.DVC_ACCESS_KEY_ID }}
-          dvc remote modify origin --local secret_access_key ${{ secrets.DVC_SECRET_ACCESS_KEY }}
+          dvc remote modify origin --local access_key_id 42527d2ba794fcd8a8c503b97f12d899a50f44b8
+          dvc remote modify origin --local secret_access_key 42527d2ba794fcd8a8c503b97f12d899a50f44b8
           dvc pull -f
 
       - name: Fetch data
