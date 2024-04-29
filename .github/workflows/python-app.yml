@@ -47,8 +47,8 @@ jobs:
       - name: Setup git
         run: |
           git add .dvc/config
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "mitja.cesar1@student.um.si"
+          git config --local user.name "CesarMitja"
       - name: Configure DVC Remote and pull
         run: |
           dvc remote add origin s3://dvc -f
