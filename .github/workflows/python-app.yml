@@ -46,6 +46,7 @@ jobs:
           pip install requests datetime pathlib pandas dvc dvc[s3]
       - name: Setup git
         run: |
+          git add .dvc/config
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
       - name: Configure DVC Remote and pull
