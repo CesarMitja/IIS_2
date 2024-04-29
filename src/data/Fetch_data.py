@@ -55,6 +55,7 @@ def main():
     weather_data = fetch_weather()
     store_weather_data(weather_data)
     fetch_and_store_bike_data()
+    print(f"Data saved to vreme and kolesa.csv.")
 
 if __name__ == "__main__":
     main()
