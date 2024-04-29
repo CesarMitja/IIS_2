@@ -48,8 +48,8 @@ jobs:
       - name: Setup git
         run: |
           git add .dvc/config
-          git config --local user.email "mitja.cesar1@student.um.si"
-          git config --local user.name "CesarMitja"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
       - name: Configure DVC Remote and pull
         run: |
           dvc remote add origin s3://dvc -f
@@ -59,17 +59,19 @@ jobs:
           dvc pull -f
 
       - name: Fetch data
-        run: python src/data/Fetch_data.py
-      - name: Process data
-        run: python src/data/Process_data.py
-
-
-      - name: Add data with DVC and GIT
-        run: |
+        run: 
+          python src/data/Fetch_data.py
           dvc add data/raw/kolesa.csv
           dvc add data/raw/vreme.csv
+          dvc push -r origin data/raw/vreme.csv
+          dvc push -r origin data/raw/kolesa.csv
+      - name: Process data
+        run: 
+          python src/data/Process_data.py
           dvc add data/processed/data_for_prediction.csv
-          dvc push
+          dvc push -r origin data/processed/data_for_prediction.csv
+      - name: Add data with GIT
+        run: |
           git add .
           git commit -m "Update data" -a || echo "No changes to commit"
           git push
