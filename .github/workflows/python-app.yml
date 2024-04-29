@@ -64,14 +64,14 @@ jobs:
 
       - name: Setup auto stage and add data with DVC
         run: |
-          dvc config core.autostage true
           dvc add data/raw/kolesa.csv
           dvc add data/raw/vreme.csv
           dvc add data/processed/data_for_prediction.csv
+          dvc push
           git add .
           git commit -m "Update data" -a || echo "No changes to commit"
           git push
-          dvc push 
+           
 
   build-and-run-docker:
     if: github.event_name == 'push'
