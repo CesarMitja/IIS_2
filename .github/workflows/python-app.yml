@@ -65,7 +65,7 @@ jobs:
         id: copy
         if: steps.config.outcome == 'success'
         run: 
-          cp data/processed/data_for_predictiom.csv data/processed/prediction_ref.csv;
+          cp data/processed/data_for_prediction.csv data/processed/prediction_ref.csv;
           cp data/raw/vreme.csv data/raw/vreme_ref.csv.csv;
           cp data/raw/kolesa.csv data/raw/kolesa_ref.csv
 
