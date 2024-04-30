@@ -1,5 +1,5 @@
 outs:
-- md5: 052a2608d65693721974318c4f25d659
-  size: 31378
+- md5: a90588cd02bd4fd2520f9c5e2eae70b7
+  size: 31438
   hash: md5
   path: data_for_prediction.csv
