@@ -66,7 +66,7 @@ jobs:
         if: steps.config.outcome == 'success'
         run: 
           cp data/processed/data_for_prediction.csv data/processed/prediction_ref.csv;
-          cp data/raw/vreme.csv data/raw/vreme_ref.csv.csv;
+          cp data/raw/vreme.csv data/raw/vreme_ref.csv;
           cp data/raw/kolesa.csv data/raw/kolesa_ref.csv
 
       - name: Fetch data
@@ -98,7 +98,7 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
-          
+
       - name: Add data with GIT
         if: steps.validate.outcome == 'success'
         run: |
