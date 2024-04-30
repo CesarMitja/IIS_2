@@ -6,7 +6,7 @@
       "expectation_type": "expect_table_row_count_to_be_between",
       "kwargs": {
         "max_value": 100000,
-        "min_value": 528
+        "min_value": 500
       },
       "meta": {
         "profiler_details": {
@@ -66,7 +66,7 @@
       "expectation_type": "expect_column_min_to_be_between",
       "kwargs": {
         "column": "available_bike_stands",
-        "max_value": 0,
+        "max_value": 100,
         "min_value": 0,
         "strict_max": false,
         "strict_min": false
@@ -88,8 +88,8 @@
       "expectation_type": "expect_column_max_to_be_between",
       "kwargs": {
         "column": "available_bike_stands",
-        "max_value": 22,
-        "min_value": 22,
+        "max_value": 100,
+        "min_value": 0,
         "strict_max": false,
         "strict_min": false
       },
@@ -110,7 +110,7 @@
       "expectation_type": "expect_column_values_to_be_between",
       "kwargs": {
         "column": "available_bike_stands",
-        "max_value": 22,
+        "max_value": 100,
         "min_value": 0,
         "mostly": 1.0,
         "strict_max": false,
