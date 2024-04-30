@@ -31,9 +31,10 @@ jobs:
       - name: Test with pytest
         run: pytest
 
-  fetch-and-process-data:
+
+  Test_validate_fetch_and_process-data:
     needs: build
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests datetime pathlib pandas dvc dvc[s3]
+          pip install requests datetime pathlib pandas dvc dvc[s3] great_expectations evidently==0.2.8 black jupiter
       - name: Setup git
         run: |
           git add .dvc/config
@@ -60,6 +61,14 @@ jobs:
           dvc remote modify origin --local secret_access_key 42527d2ba794fcd8a8c503b97f12d899a50f44b8
           dvc pull -f
 
+      - name: Copy data
+        id: copy
+        if: steps.config.outcome == 'success'
+        run: 
+          cp data/processed/data_for_predictiom.csv data/processed/prediction_ref.csv
+          cp data/raw/vreme.csv data/raw/vreme_ref.csv.csv
+          cp data/raw/kolesa.csv data/raw/kolesa_ref.csv
+
       - name: Fetch data
         id: fetch
         if: steps.config.outcome == 'success'
@@ -72,8 +81,15 @@ jobs:
         run: 
           python src/data/Process_data.py
 
-      - name: Add data with GIT
+      - name: Validate Data 
+        id: validate
         if: steps.proc.outcome == 'success'
+        run: |
+          python test_data/valid_and_test_data.py
+          echo "Y" | great_expectations docs build
+          
+      - name: Add data with GIT
+        if: steps.validate.outcome == 'success'
         run: |
           dvc add data/raw/vreme.csv
           dvc push -r origin data/raw/vreme.csv
@@ -87,7 +103,7 @@ jobs:
            
 
   build-and-run-docker:
-    needs: fetch-and-process-data
+    needs: Test_validate_fetch_and_process-data
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
