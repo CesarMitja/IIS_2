@@ -36,14 +36,11 @@ def check_all_checkpoints():
     checkpoints = ["vreme_check","kolesa_check","pred_check"]
     for checkpoint in checkpoints:
         try:
+            print(f"Running heckpoint {checkpoint}.")
             run_checkpoint(checkpoint)
             x = x + 1
         except CheckpointNotFoundError:
-            print("Checkpoint {checkpoint} does not exist.")
-        # print(f"Running checkpoint: {checkpoint}")
-        # if not run_checkpoint(checkpoint):
-        #     print(f"Checkpoint failed: {checkpoint}")
-
+            print(f"Checkpoint {checkpoint} does not exist.")
             return False
     if x == 3 :
         return True
