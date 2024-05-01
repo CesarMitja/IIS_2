@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    if: github.event_name == 'schedule' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -102,7 +103,7 @@ jobs:
 
 
       - name: Add data with GIT
-        if: steps.validate.outcome == 'success'
+        #if: steps.validate.outcome == 'success'
         run: |
           dvc add data/raw/vreme.csv
           dvc push -r origin data/raw/vreme.csv
@@ -116,7 +117,7 @@ jobs:
            
 
   build-and-run-docker:
-    needs: Test_validate_fetch_and_process-data
+    needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
