@@ -11,7 +11,8 @@ from sklearn.impute import SimpleImputer
 import joblib
 import mlflow
 from mlflow.tracking import MlflowClient
-
+import dagshub
+dagshub.init(repo_name="IIS-2", repo_owner="CesarMitja", mlflow=True)
 # MLflow settings
 mlflow.set_tracking_uri('https://dagshub.com/CesarMitja/IIS_2.mlflow')
 mlflow.set_experiment('Bike_Stand_Prediction')
@@ -52,7 +53,7 @@ class RNNModel(nn.Module):
         out = self.linear(hn[-1])
         return out.squeeze()
 
-model = RNNModel(input_size=len(features), hidden_size=50, num_layers=1, output_size=1)
+model = RNNModel(input_size=len(features), hidden_size=100, num_layers=1, output_size=1)
 
 # Training settings
 criterion = nn.MSELoss()
