@@ -92,18 +92,18 @@ jobs:
       #     echo "Y" | great_expectations docs build
       
           
-      - name: Deploy DataDocs to Netlify
-        uses: nwtgck/actions-netlify@v1.2
-        with:
-          publish-dir: "great_expectations/uncommitted/data_docs/local_site"
-          production-deploy: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      # - name: Deploy DataDocs to Netlify
+      #   uses: nwtgck/actions-netlify@v1.2
+      #   with:
+      #     publish-dir: "great_expectations/uncommitted/data_docs/local_site"
+      #     production-deploy: true
+      #   env:
+      #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
 
       - name: Add data with GIT
-        #if: steps.validate.outcome == 'success'
+      # if: steps.validate.outcome == 'success'
         run: |
           dvc add data/raw/vreme.csv
           dvc push -r origin data/raw/vreme.csv
