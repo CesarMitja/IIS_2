@@ -32,18 +32,21 @@ def run_checkpoint(checkpoint_name):
 
 def check_all_checkpoints():
     """ Run all checkpoints and return False if any of them fail """
+    x = 0
     checkpoints = ["vreme_check","kolesa_check","pred_check"]
     for checkpoint in checkpoints:
         try:
             run_checkpoint(checkpoint)
-            return True
+            x = x + 1
         except CheckpointNotFoundError:
             print("Checkpoint {checkpoint} does not exist.")
         # print(f"Running checkpoint: {checkpoint}")
         # if not run_checkpoint(checkpoint):
         #     print(f"Checkpoint failed: {checkpoint}")
+
             return False
-    
+    if x == 3 :
+        return True
 
 
 def evidently_test(current_data, reference_data, report_filename):
