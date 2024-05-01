@@ -20,7 +20,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dvc dvc[s3] sklearn torch mlflow
+          pip install dvc dvc[s3] mlflow
       - name: Configure DVC Remote and pull
         run: |
           dvc remote add origin s3://dvc -f
@@ -34,7 +34,7 @@ jobs:
 
       - name: Execute Machine Learning Script
         run: python src/models/Prediction_mlflow.py  
-        
+
       - name: Commit and push updates
         run: |
           git config --global user.email "action@github.com"
