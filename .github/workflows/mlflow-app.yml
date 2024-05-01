@@ -21,7 +21,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc dvc[s3] mlflow
-      - name: Configure DVC Remote and pull
+      - name: Set up DVC and MLflow Environment
         run: |
           dvc remote add origin s3://dvc -f
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
@@ -31,6 +31,7 @@ jobs:
           export MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}
           export MLFLOW_TRACKING_URI="https://dagshub.com/CesarMitja/IIS_2.mlflow"
           dvc pull --force
+        shell: bash
 
       - name: Execute Machine Learning Script
         run: python src/models/Prediction_mlflow.py  
