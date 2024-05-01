@@ -13,7 +13,7 @@ import mlflow
 from mlflow.tracking import MlflowClient
 import dagshub
 
-dagshub_token = os.environ.get('DAGS')
+dagshub_token = "9afb330391a28d5362f1f842cac05eef42708362"
 dagshub.auth.add_app_token(dagshub_token)
 dagshub.init(repo_name="IIS-2", repo_owner="CesarMitja", mlflow=True)
 # MLflow settings
