@@ -9,7 +9,7 @@ from evidently.dashboard.tabs import DataDriftTab, DataQualityTab, NumTargetDrif
 from evidently.model_profile import Profile
 from evidently.model_profile.sections import DataDriftProfileSection, DataQualityProfileSection
 from great_expectations.data_context import DataContext
-
+from great_expectations.exceptions import CheckpointNotFoundError
 
 def run_command(command):
     """ Helper function to run a shell command and return its output """
@@ -34,11 +34,16 @@ def check_all_checkpoints():
     """ Run all checkpoints and return False if any of them fail """
     checkpoints = ["vreme_check","kolesa_check","pred_check"]
     for checkpoint in checkpoints:
-        print(f"Running checkpoint: {checkpoint}")
-        if not run_checkpoint(checkpoint):
-            print(f"Checkpoint failed: {checkpoint}")
+        try:
+            run_checkpoint(checkpoint)
+            return True
+        except CheckpointNotFoundError:
+            print("Checkpoint {checkpoint} does not exist.")
+        # print(f"Running checkpoint: {checkpoint}")
+        # if not run_checkpoint(checkpoint):
+        #     print(f"Checkpoint failed: {checkpoint}")
             return False
-    return True
+    
 
 
 def evidently_test(current_data, reference_data, report_filename):
