@@ -12,6 +12,9 @@ import joblib
 import mlflow
 from mlflow.tracking import MlflowClient
 import dagshub
+
+dagshub_token = os.environ.get('DAGS')
+dagshub.auth.add_app_token(dagshub_token)
 dagshub.init(repo_name="IIS-2", repo_owner="CesarMitja", mlflow=True)
 # MLflow settings
 mlflow.set_tracking_uri('https://dagshub.com/CesarMitja/IIS_2.mlflow')
