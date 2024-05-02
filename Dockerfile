@@ -2,7 +2,7 @@ FROM python:3.9
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir poetry pytest flask pandas torch flask_cors joblib joblib scikit-learn numpy mlflow apscheduler onnxruntime dagshub datetime PyMongo pymongo
+RUN pip install --no-cache-dir poetry pytest flask pandas torch flask_cors joblib joblib scikit-learn numpy mlflow apscheduler onnxruntime dagshub datetime flask_pymongo requests pymongo 
 
 COPY . .
 
