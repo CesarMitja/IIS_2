@@ -7,6 +7,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import MinMaxScaler
 from flask_cors import CORS
+import torch.nn as nn
 
 class RNNModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, output_size):
