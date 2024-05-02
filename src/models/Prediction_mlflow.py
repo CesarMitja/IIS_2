@@ -11,7 +11,11 @@ from sklearn.impute import SimpleImputer
 import joblib
 import mlflow
 from mlflow.tracking import MlflowClient
+import dagshub
 
+dagshub_token = '9afb330391a28d5362f1f842cac05eef42708362'
+dagshub.auth.add_app_token(dagshub_token)
+dagshub.init(repo_name="IIS_2", repo_owner="CesarMitja", mlflow=True)
 # Setup MLflow
 mlflow.set_tracking_uri('https://dagshub.com/CesarMitja/IIS_2.mlflow')
 mlflow.set_experiment('Bike_Stand_Prediction')
@@ -58,24 +62,29 @@ criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Function to create data sequences
-def create_sequences(input_data, target_data, sequence_length):
+def create_sequences(input_data, target_data, sequence_length, forecast_horizon):
     sequences = []
     targets = []
-    for start_pos in range(len(input_data) - sequence_length):
+    for start_pos in range(len(input_data) - sequence_length - forecast_horizon + 1):
         end_pos = start_pos + sequence_length
-        sequence = input_data[start_pos:end_pos]
-        target = target_data[end_pos:end_pos+7]  # Adjust target to predict 7 steps ahead
-        sequences.append(sequence)
-        targets.append(target)
+        seq = input_data[start_pos:end_pos]
+        target_seq = target_data[end_pos:end_pos + forecast_horizon]
+        sequences.append(seq)
+        targets.append(target_seq)
     return np.array(sequences), np.array(targets)
 
-# Create sequences
-sequence_length = 72  # 72 hours input
-X_train, y_train = create_sequences(train_features, train_data['available_bike_stands'].values, sequence_length)
-X_test, y_test = create_sequences(test_features, test_data['available_bike_stands'].values, sequence_length)
+# Update sequence creation calls in your main script
+sequence_length = 32  # 72 hours of data
+forecast_horizon = 7  # Predict 7 hours ahead
 
-X_train, y_train = torch.tensor(X_train, dtype=torch.float32), torch.tensor(y_train, dtype=torch.float32)
-X_test, y_test = torch.tensor(X_test, dtype=torch.float32), torch.tensor(y_test, dtype=torch.float32)
+X_train, y_train = create_sequences(train_features, train_data['available_bike_stands'].values, sequence_length, forecast_horizon)
+X_test, y_test = create_sequences(test_features, test_data['available_bike_stands'].values, sequence_length, forecast_horizon)
+print(f"Train dataset size: {len(X_train)}, Test dataset size: {len(X_test)}")
+
+X_train = torch.tensor(X_train, dtype=torch.float32)
+y_train = torch.tensor(y_train, dtype=torch.float32)
+X_test = torch.tensor(X_test, dtype=torch.float32)
+y_test = torch.tensor(y_test, dtype=torch.float32)
 
 train_data = TensorDataset(X_train, y_train)
 train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
@@ -90,7 +99,7 @@ def train_and_evaluate_model():
             for inputs, targets in train_loader:
                 optimizer.zero_grad()
                 outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                loss = criterion(outputs, targets.view(targets.size(0), -1))
                 loss.backward()
                 optimizer.step()
                 mlflow.log_metric("train_loss", loss.item(), step=epoch)
@@ -100,7 +109,7 @@ def train_and_evaluate_model():
             total_loss = 0
             for inputs, targets in test_loader:
                 outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                loss = criterion(outputs, targets.view(targets.size(0), -1))
                 total_loss += loss.item()
             avg_loss = total_loss / len(test_loader)
             mlflow.log_metric("test_loss", avg_loss)
