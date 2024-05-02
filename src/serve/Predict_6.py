@@ -15,7 +15,7 @@ import mlflow
 import dagshub
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from flask_cors import cross_origin
 
 app = Flask(__name__)
 
@@ -36,7 +36,7 @@ mlflow.set_experiment('Bike_Stand_Prediction_Service_ONNX_Daily')
 
 
 
-app = Flask(__name__)
+
 CORS(app)
 
 mlflow_client = MlflowClient()
@@ -88,6 +88,7 @@ def load_last_72_rows(csv_file_path):
 
 
 @app.route('/predict', methods=['POST'])
+@cross_origin()
 def predict():
     try:
         input_data = load_last_72_rows(csv_file_path)
