@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+import torch.onnx
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -16,79 +17,59 @@ import dagshub
 dagshub_token = '9afb330391a28d5362f1f842cac05eef42708362'
 dagshub.auth.add_app_token(dagshub_token)
 dagshub.init(repo_name="IIS_2", repo_owner="CesarMitja", mlflow=True)
-# Setup MLflow
 mlflow.set_tracking_uri('https://dagshub.com/CesarMitja/IIS_2.mlflow')
-mlflow.set_experiment('Bike_Stand_Prediction')
+mlflow.set_experiment('Bike_Stand_Prediction_ONNX')
 
 client = MlflowClient()
 try:
-    # Attempt to load the latest registered model's metrics
-    latest_version = client.get_latest_versions("Bike_Stand_Prediction_Model")[0]
+    latest_version = client.get_latest_versions("Bike_Stand_Prediction_Model_ONNX")[0]
     best_test_loss = client.get_metric_history(latest_version.run_id, "test_loss")[-1].value
 except (IndexError, ValueError, mlflow.exceptions.MlflowException):
-    best_test_loss = float('inf')  # If no model exists, set to infinity
+    best_test_loss = float('inf')
 
-# File paths
 base_dir = os.path.abspath('.')
 train_data_path = os.path.join(base_dir, 'data/processed', 'data_for_prediction.csv')
 test_data_path = os.path.join(base_dir, 'data/processed', 'test.csv')
 scaler_path = os.path.join(base_dir, 'models', 'scaler.pkl')
 model_path = os.path.join(base_dir, 'models', 'rnn_model.pth')
+onnx_model_path = os.path.join(base_dir, 'models', 'model.onnx')
 
-# Read and prepare data
 train_data = pd.read_csv(train_data_path)
 test_data = pd.read_csv(test_data_path)
-features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 
-            'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']
+features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']
 
-# Preprocessing pipeline
 pipeline = Pipeline([
     ('imputer', SimpleImputer(strategy='mean')),
     ('scaler', MinMaxScaler())
 ])
-
-# Preprocess data
 train_features = pipeline.fit_transform(train_data[features])
 test_features = pipeline.transform(test_data[features])
 
-
-# Define the model
 class RNNModel(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, output_size, dropout=0.5):
         super(RNNModel, self).__init__()
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=dropout)
         self.linear = nn.Linear(hidden_size, output_size)
-
     def forward(self, x):
         x, (hn, _) = self.lstm(x)
-        x = self.linear(hn[-1])
-        return x
+        return self.linear(hn[-1])
 
 model = RNNModel(input_size=len(features), hidden_size=100, num_layers=2, output_size=7, dropout=0.3)
-
-# Training settings
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Function to create data sequences
 def create_sequences(input_data, target_data, sequence_length, forecast_horizon):
-    sequences = []
-    targets = []
+    sequences, targets = [], []
     for start_pos in range(len(input_data) - sequence_length - forecast_horizon + 1):
         end_pos = start_pos + sequence_length
-        seq = input_data[start_pos:end_pos]
-        target_seq = target_data[end_pos:end_pos + forecast_horizon]
-        sequences.append(seq)
-        targets.append(target_seq)
+        sequences.append(input_data[start_pos:end_pos])
+        targets.append(target_data[end_pos:end_pos + forecast_horizon])
     return np.array(sequences), np.array(targets)
 
-# Update sequence creation calls in your main script
-sequence_length = 72  # 72 hours of data
-forecast_horizon = 7  # Predict 7 hours ahead
-
+sequence_length = 72
+forecast_horizon = 7
 X_train, y_train = create_sequences(train_features, train_data['available_bike_stands'].values, sequence_length, forecast_horizon)
 X_test, y_test = create_sequences(test_features, test_data['available_bike_stands'].values, sequence_length, forecast_horizon)
-print(f"Train dataset size: {len(X_train)}, Test dataset size: {len(X_test)}")
 
 X_train = torch.tensor(X_train, dtype=torch.float32)
 y_train = torch.tensor(y_train, dtype=torch.float32)
@@ -100,10 +81,9 @@ train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
 test_data = TensorDataset(X_test, y_test)
 test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
 
-# Train and evaluate model with MLflow
 def train_and_evaluate_model():
     with mlflow.start_run():
-        for epoch in range(50):  
+        for epoch in range(50):
             model.train()
             total_train_loss = 0
             for inputs, targets in train_loader:
@@ -128,7 +108,11 @@ def train_and_evaluate_model():
 
         if avg_test_loss < best_test_loss:
             torch.save(model.state_dict(), model_path)
-            mlflow.pytorch.log_model(model, "model", registered_model_name="Bike_Stand_Prediction_Model")
+            # Export to ONNX and save the model to MLflow
+            dummy_input = torch.randn(1, sequence_length, len(features))
+            torch.onnx.export(model, dummy_input, onnx_model_path, export_params=True, opset_version=11)
+            mlflow.log_artifact(onnx_model_path, "model")
+            mlflow.pytorch.log_model(model, "model", registered_model_name="Bike_Stand_Prediction_Model_ONNX")
             joblib.dump(pipeline, scaler_path)
             mlflow.log_artifact(scaler_path, "model")
             print("New model saved with improved test loss: {:.4f}".format(avg_test_loss))
