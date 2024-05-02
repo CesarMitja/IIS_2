@@ -67,6 +67,7 @@ def create_sequences(input_data, target_data, sequence_length, forecast_horizon)
     return np.array(sequences), np.array(targets)
 
 sequence_length = 72
+
 forecast_horizon = 7
 X_train, y_train = create_sequences(train_features, train_data['available_bike_stands'].values, sequence_length, forecast_horizon)
 
