@@ -13,12 +13,20 @@ import mlflow
 from mlflow.tracking import MlflowClient
 import dagshub
 
-dagshub_token = '9afb330391a28d5362f1f842cac05eef42708362'
+dagshub_token = os.environ.get('DAGS_MLFLOW_KEY')
 dagshub.auth.add_app_token(dagshub_token)
 dagshub.init(repo_name="IIS_2", repo_owner="CesarMitja", mlflow=True)
 # Setup MLflow
 mlflow.set_tracking_uri('https://dagshub.com/CesarMitja/IIS_2.mlflow')
 mlflow.set_experiment('Bike_Stand_Prediction')
+
+client = MlflowClient()
+try:
+    # Attempt to load the latest registered model's metrics
+    latest_version = client.get_latest_versions("Bike_Stand_Prediction_Model", stages=["Production"])[0]
+    best_test_loss = client.get_metric_history(latest_version.run_id, "test_loss")[-1].value
+except (IndexError, ValueError, mlflow.exceptions.MlflowException):
+    best_test_loss = float('inf')  # If no model exists, set to infinity
 
 # File paths
 base_dir = os.path.abspath('.')
@@ -42,7 +50,7 @@ pipeline = Pipeline([
 # Preprocess data
 train_features = pipeline.fit_transform(train_data[features])
 test_features = pipeline.transform(test_data[features])
-joblib.dump(pipeline, scaler_path)
+
 
 # Define the model
 class RNNModel(nn.Module):
@@ -94,29 +102,35 @@ test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
 # Train and evaluate model with MLflow
 def train_and_evaluate_model():
     with mlflow.start_run():
-        for epoch in range(20):  # 20 epochs
+        for epoch in range(20):  # Train for 20 epochs
             model.train()
+            total_train_loss = 0
             for inputs, targets in train_loader:
                 optimizer.zero_grad()
                 outputs = model(inputs)
                 loss = criterion(outputs, targets.view(targets.size(0), -1))
                 loss.backward()
                 optimizer.step()
-                mlflow.log_metric("train_loss", loss.item(), step=epoch)
+                total_train_loss += loss.item() * inputs.size(0)
+            avg_train_loss = total_train_loss / len(train_loader.dataset)
+            mlflow.log_metric("train_loss", avg_train_loss, step=epoch)
 
         model.eval()
-        with torch.no_grad():
-            total_loss = 0
-            for inputs, targets in test_loader:
-                outputs = model(inputs)
-                loss = criterion(outputs, targets.view(targets.size(0), -1))
-                total_loss += loss.item()
-            avg_loss = total_loss / len(test_loader)
-            mlflow.log_metric("test_loss", avg_loss)
-            print(f'Test Loss: {avg_loss}')
+        total_test_loss = 0
+        for inputs, targets in test_loader:
+            outputs = model(inputs)
+            loss = criterion(outputs, targets.view(targets.size(0), -1))
+            total_test_loss += loss.item() * inputs.size(0)
+        avg_test_loss = total_test_loss / len(test_loader.dataset)
+        mlflow.log_metric("test_loss", avg_test_loss)
+        print(f'Test Loss: {avg_test_loss}')
 
-        # Save and log the model
-        torch.save(model.state_dict(), model_path)
-        mlflow.pytorch.log_model(model, "model", registered_model_name="Bike_Stand_Prediction_Model")
+        if avg_test_loss < best_test_loss:
+            torch.save(model.state_dict(), model_path)
+            mlflow.pytorch.log_model(model, "model", registered_model_name="Bike_Stand_Prediction_Model")
+            joblib.dump(pipeline, scaler_path)
+            print("New model saved with improved test loss: {:.4f}".format(avg_test_loss))
+        else:
+            print("No improvement in test loss: {:.4f}".format(avg_test_loss))
 
 train_and_evaluate_model()

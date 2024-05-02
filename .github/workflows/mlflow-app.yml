@@ -21,7 +21,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install dvc dvc[s3] mlflow dagshub
+
       - name: Set up DVC and MLflow Environment
+        env:
+          DAGS_MLFLOW_KEY: ${{ secrets.DAGS_MLFLOW_KEY }}
         run: |
           dvc remote add origin s3://dvc -f
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
@@ -30,7 +33,7 @@ jobs:
           export MLFLOW_TRACKING_USERNAME="CesarMitja"
           export MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}
           export MLFLOW_TRACKING_URI="https://dagshub.com/CesarMitja/IIS_2.mlflow"
-          export DAGS="9afb330391a28d5362f1f842cac05eef42708362"
+          export DAGS_MLFLOW_KEY
           dvc pull --force
         shell: bash
 
