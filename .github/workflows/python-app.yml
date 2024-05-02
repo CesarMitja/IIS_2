@@ -21,8 +21,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install dvc dvc[s3]
-          pip install --upgrade dvc dvc[s3]
-      - name: Configure DVC Remote and pull mlflow pymongo flask_pymongo requests flask_cors onnxruntime dagshub datetime apscheduler
+          pip install --upgrade dvc dvc[s3] mlflow pymongo flask_pymongo requests flask_cors onnxruntime dagshub datetime apscheduler
+      - name: Configure DVC Remote and pull 
         run: |
           dvc remote add origin s3://dvc -f
           dvc remote modify origin endpointurl https://dagshub.com/CesarMitja/IIS_2.s3
