@@ -29,7 +29,10 @@ model_path = os.path.join(base_dir, 'models', 'rnn_model.pth')
 scaler_path = os.path.join(base_dir, 'models', 'scaler.pkl')
 csv_file_path = os.path.join(base_dir, 'data', 'processed', 'data_for_prediction.csv')
 
-model = RNNModel(input_size=9, hidden_size=50, num_layers=1, output_size=7)
+features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 
+            'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']
+
+model = RNNModel(input_size=len(features), hidden_size=50, num_layers=1, output_size=7)
 model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
 
@@ -46,20 +49,21 @@ def make_prediction(input_data):
 
 def load_last_72_rows(csv_file_path):
     df = pd.read_csv(csv_file_path)
-    features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature',
-                'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']
+    features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 
+            'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']
     df = df[features]  # Ensure the correct columns are used
     if len(df) >= 32:
         df = df.tail(32)  # Use the last 72 hours
     else:
         raise ValueError("Not enough data. Need at least 72 rows.")
     
-    return df.values  # Return as NumPy array
+    return df#.values  # Return as NumPy array
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         input_data = load_last_72_rows(csv_file_path)
+        #print(input_data)
         predictions = make_prediction(input_data)
         results = {"predictions": predictions.tolist()}
         return jsonify(results)
