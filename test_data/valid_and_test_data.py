@@ -33,7 +33,7 @@ def run_checkpoint(checkpoint_name):
 def check_all_checkpoints():
     """ Run all checkpoints and return False if any of them fail """
     x = 0
-    checkpoints = ["vreme_check","kolesa_check","pred_check"]
+    checkpoints = ["kolesa_check","vreme_check","pred_check"]
     for checkpoint in checkpoints:
         try:
             print(f"Running heckpoint {checkpoint}.")

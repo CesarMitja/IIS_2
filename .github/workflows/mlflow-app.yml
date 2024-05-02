@@ -2,7 +2,7 @@ name: Machine Learning Pipeline
 
 on:
   workflow_run:
-    workflows: ["Python app"]  # Assuming "Data Pipeline" is the name of your data processing workflow
+    workflows: ["Python app"] 
     types:
       - completed
 
@@ -20,7 +20,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dvc dvc[s3] mlflow dagshub
+          pip install dvc dvc[s3] mlflow dagshub onnx
 
       - name: Set up DVC and MLflow Environment
         env:
@@ -38,12 +38,5 @@ jobs:
         shell: bash
 
       - name: Execute Machine Learning Script
-        run: python src/models/Prediction_mlflow.py  
+        run: python src/models/Prediction_mlflow_onnx.py  
 
-      - name: Commit and push updates
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add .
-          git commit -m "Update model and metrics" -a || echo "No changes to commit"
-          git push

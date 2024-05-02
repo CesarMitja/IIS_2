@@ -1,14 +1,14 @@
 name: Build docker app
 
 on:
-    workflow_run:
-      workflows: ["Python app"] 
-      types:
-        - completed
+    push:
+        branches:
+        - main
+        paths:
+        - src
 
 jobs:
   build-and-run-docker:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
