@@ -69,10 +69,12 @@ def create_sequences(input_data, target_data, sequence_length, forecast_horizon)
 sequence_length = 72
 forecast_horizon = 7
 X_train, y_train = create_sequences(train_features, train_data['available_bike_stands'].values, sequence_length, forecast_horizon)
+
 X_test, y_test = create_sequences(test_features, test_data['available_bike_stands'].values, sequence_length, forecast_horizon)
 
 X_train = torch.tensor(X_train, dtype=torch.float32)
 y_train = torch.tensor(y_train, dtype=torch.float32)
+
 X_test = torch.tensor(X_test, dtype=torch.float32)
 y_test = torch.tensor(y_test, dtype=torch.float32)
 

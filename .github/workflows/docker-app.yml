@@ -3,7 +3,7 @@ name: Build docker app
 on:
     push:
         paths:
-        - src
+            - src/**
 
 jobs:
   build-and-run-docker:

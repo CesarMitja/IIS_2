@@ -18,6 +18,7 @@ def run_command(command):
         print("Error running command:", command)
         print("Command Output:", result.stdout)
         print("Command Error:", result.stderr)
+        print("Upajmo")
         return None
     return result.stdout
 
