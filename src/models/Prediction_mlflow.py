@@ -11,12 +11,8 @@ from sklearn.impute import SimpleImputer
 import joblib
 import mlflow
 from mlflow.tracking import MlflowClient
-import dagshub
 
-dagshub_token = "9afb330391a28d5362f1f842cac05eef42708362"
-dagshub.auth.add_app_token(dagshub_token)
-dagshub.init(repo_name="IIS-2", repo_owner="CesarMitja", mlflow=True)
-# MLflow settings
+# Setup MLflow
 mlflow.set_tracking_uri('https://dagshub.com/CesarMitja/IIS_2.mlflow')
 mlflow.set_experiment('Bike_Stand_Prediction')
 
@@ -27,7 +23,7 @@ test_data_path = os.path.join(base_dir, 'data/processed', 'test.csv')
 scaler_path = os.path.join(base_dir, 'models', 'scaler.pkl')
 model_path = os.path.join(base_dir, 'models', 'rnn_model.pth')
 
-# Data reading and preparation
+# Read and prepare data
 train_data = pd.read_csv(train_data_path)
 test_data = pd.read_csv(test_data_path)
 features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 
@@ -39,7 +35,7 @@ pipeline = Pipeline([
     ('scaler', MinMaxScaler())
 ])
 
-# Data preprocessing
+# Preprocess data
 train_features = pipeline.fit_transform(train_data[features])
 test_features = pipeline.transform(test_data[features])
 joblib.dump(pipeline, scaler_path)
@@ -53,38 +49,65 @@ class RNNModel(nn.Module):
 
     def forward(self, x):
         _, (hn, _) = self.lstm(x)
-        out = self.linear(hn[-1])
-        return out.squeeze()
+        return self.linear(hn[-1])
 
-model = RNNModel(input_size=len(features), hidden_size=100, num_layers=1, output_size=1)
+model = RNNModel(input_size=len(features), hidden_size=50, num_layers=1, output_size=7)
 
 # Training settings
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Training and evaluation function with MLflow
-def train_and_evaluate_model(model, train_features, test_features, criterion, optimizer, num_epochs=20):
-    with mlflow.start_run() as run:
-        # Train the model
-        for epoch in range(num_epochs):
-            model.train()
-            outputs = model(torch.tensor(train_features, dtype=torch.float32))
-            train_targets = torch.tensor(train_data['available_bike_stands'].values, dtype=torch.float32).view(-1, 1)
-            loss = criterion(outputs, train_targets)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            mlflow.log_metric("train_loss", loss.item(), step=epoch)
+# Function to create data sequences
+def create_sequences(input_data, target_data, sequence_length):
+    sequences = []
+    targets = []
+    for start_pos in range(len(input_data) - sequence_length):
+        end_pos = start_pos + sequence_length
+        sequence = input_data[start_pos:end_pos]
+        target = target_data[end_pos:end_pos+7]  # Adjust target to predict 7 steps ahead
+        sequences.append(sequence)
+        targets.append(target)
+    return np.array(sequences), np.array(targets)
 
-        # Evaluate the model
+# Create sequences
+sequence_length = 72  # 72 hours input
+X_train, y_train = create_sequences(train_features, train_data['available_bike_stands'].values, sequence_length)
+X_test, y_test = create_sequences(test_features, test_data['available_bike_stands'].values, sequence_length)
+
+X_train, y_train = torch.tensor(X_train, dtype=torch.float32), torch.tensor(y_train, dtype=torch.float32)
+X_test, y_test = torch.tensor(X_test, dtype=torch.float32), torch.tensor(y_test, dtype=torch.float32)
+
+train_data = TensorDataset(X_train, y_train)
+train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
+test_data = TensorDataset(X_test, y_test)
+test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
+
+# Train and evaluate model with MLflow
+def train_and_evaluate_model():
+    with mlflow.start_run():
+        for epoch in range(20):  # 20 epochs
+            model.train()
+            for inputs, targets in train_loader:
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                loss.backward()
+                optimizer.step()
+                mlflow.log_metric("train_loss", loss.item(), step=epoch)
+
         model.eval()
         with torch.no_grad():
-            predictions = model(torch.tensor(test_features, dtype=torch.float32))
-            test_targets = torch.tensor(test_data['available_bike_stands'].values, dtype=torch.float32).view(-1, 1)
-            test_loss = criterion(predictions, test_targets)
-            mlflow.log_metric("test_loss", test_loss.item())
+            total_loss = 0
+            for inputs, targets in test_loader:
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                total_loss += loss.item()
+            avg_loss = total_loss / len(test_loader)
+            mlflow.log_metric("test_loss", avg_loss)
+            print(f'Test Loss: {avg_loss}')
 
-        # Log and register the model if it's an improvement or if no model exists
+        # Save and log the model
+        torch.save(model.state_dict(), model_path)
         mlflow.pytorch.log_model(model, "model", registered_model_name="Bike_Stand_Prediction_Model")
 
-train_and_evaluate_model(model, train_features, test_features, criterion, optimizer)
+train_and_evaluate_model()
