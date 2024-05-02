@@ -107,7 +107,7 @@
         }
 
         function displayResults(data) {
-            const resultsDiv = document.getElementById('results');  // Fixed the div ID here, it should be 'results' based on your HTML structure
+            const resultsDiv = document.getElementById('results');  
             if (data.error) {
                 resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
                 return;
