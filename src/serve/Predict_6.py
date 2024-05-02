@@ -36,7 +36,7 @@ mlflow.set_experiment('Bike_Stand_Prediction_Service_ONNX_Daily')
 
 
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 mlflow_client = MlflowClient()
 model_name = "Bike_Stand_Prediction_Model_ONNX"
@@ -87,7 +87,7 @@ def load_last_72_rows(csv_file_path):
 
 
 @app.route('/predict', methods=['POST'])
-@cross_origin()
+@cross_origin(origin='*')  # Adjust as needed
 def predict():
     try:
         input_data = load_last_72_rows(csv_file_path)
