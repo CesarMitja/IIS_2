@@ -24,7 +24,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Update paths accordingly
-base_dir = os.path.abspath(os.path.dirname(__file__))
+base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 model_path = os.path.join(base_dir, 'models', 'rnn_model.pth')
 scaler_path = os.path.join(base_dir, 'models', 'scaler.pkl')
 csv_file_path = os.path.join(base_dir, 'data', 'processed', 'data_for_prediction.csv')
