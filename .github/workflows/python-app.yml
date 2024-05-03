@@ -87,22 +87,22 @@ jobs:
       - name: List Checkpoints directory
         run: ls -la ./great_expectations/checkpoints/
         
-      # - name: Validate Data 
-      #   id: validate
-      #   if: steps.proc.outcome == 'success'
-      #   run: |
-      #     python test_data/valid_and_test_data.py
-      #     echo "Y" | great_expectations docs build
+      - name: Validate Data 
+        id: validate
+        if: steps.proc.outcome == 'success'
+        run: |
+          python test_data/valid_and_test_data.py
+          echo "Y" | great_expectations docs build
       
           
-      # - name: Deploy DataDocs to Netlify
-      #   uses: nwtgck/actions-netlify@v1.2
-      #   with:
-      #     publish-dir: "great_expectations/uncommitted/data_docs/local_site"
-      #     production-deploy: true
-      #   env:
-      #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      - name: Deploy DataDocs to Netlify
+        uses: nwtgck/actions-netlify@v1.2
+        with:
+          publish-dir: "great_expectations/uncommitted/data_docs/local_site"
+          production-deploy: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
 
       - name: Add data with GIT
