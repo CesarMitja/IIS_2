@@ -1,0 +1,293 @@
+{
+  "evaluation_parameters": {},
+  "meta": {
+    "active_batch_definition": {
+      "batch_identifiers": {},
+      "data_asset_name": "data_for_prediction.csv",
+      "data_connector_name": "csv_processed_files",
+      "datasource_name": "IIS"
+    },
+    "batch_markers": {
+      "ge_load_time": "20240501T073803.286408Z",
+      "pandas_data_fingerprint": "e083efa7a993009b5722bdeeb2001219"
+    },
+    "batch_spec": {
+      "path": "C:\\Users\\mitja\\Desktop\\in\u017einirstvo\\Druga\\great_expectations\\..\\data\\processed\\data_for_prediction.csv"
+    },
+    "checkpoint_id": null,
+    "checkpoint_name": "pred_check",
+    "expectation_suite_name": "pred_suite",
+    "great_expectations_version": "0.18.13",
+    "run_id": {
+      "run_name": "20240501-073803-my-run-name-template",
+      "run_time": "2024-05-01T09:38:03.280384+02:00"
+    },
+    "validation_id": null,
+    "validation_time": "20240501T073803.318538Z"
+  },
+  "results": [
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_table_row_count_to_be_between",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "max_value": 100000,
+          "min_value": 500
+        },
+        "meta": {
+          "profiler_details": {
+            "metric_configuration": {
+              "domain_kwargs": {},
+              "metric_name": "table.row_count",
+              "metric_value_kwargs": null
+            },
+            "num_batches": 1
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "observed_value": 528
+      },
+      "success": true
+    },
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_table_columns_to_match_set",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "column_set": [
+            "dew_point",
+            "surface_pressure",
+            "relative_humidity",
+            "temperature",
+            "date",
+            "available_bike_stands",
+            "apparent_temperature",
+            "precipitation_probability",
+            "rain",
+            "bike_stands"
+          ],
+          "exact_match": null
+        },
+        "meta": {
+          "profiler_details": {
+            "success_ratio": 1.0
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "observed_value": [
+          "date",
+          "temperature",
+          "relative_humidity",
+          "dew_point",
+          "apparent_temperature",
+          "precipitation_probability",
+          "rain",
+          "surface_pressure",
+          "bike_stands",
+          "available_bike_stands"
+        ]
+      },
+      "success": true
+    },
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_column_values_to_not_be_null",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "column": "temperature"
+        },
+        "meta": {
+          "profiler_details": {
+            "metric_configuration": {
+              "domain_kwargs": {
+                "column": "temperature"
+              },
+              "metric_name": "column_values.nonnull.unexpected_count",
+              "metric_value_kwargs": null
+            },
+            "num_batches": 1
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "element_count": 528,
+        "partial_unexpected_counts": [],
+        "partial_unexpected_index_list": [],
+        "partial_unexpected_list": [],
+        "unexpected_count": 0,
+        "unexpected_percent": 0.0
+      },
+      "success": true
+    },
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_column_min_to_be_between",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "column": "temperature",
+          "max_value": 100,
+          "min_value": 0,
+          "strict_max": false,
+          "strict_min": false
+        },
+        "meta": {
+          "profiler_details": {
+            "metric_configuration": {
+              "domain_kwargs": {
+                "column": "temperature"
+              },
+              "metric_name": "column.min",
+              "metric_value_kwargs": null
+            },
+            "num_batches": 1
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "observed_value": 1.4
+      },
+      "success": true
+    },
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_column_values_to_not_be_null",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "column": "relative_humidity"
+        },
+        "meta": {
+          "profiler_details": {
+            "metric_configuration": {
+              "domain_kwargs": {
+                "column": "relative_humidity"
+              },
+              "metric_name": "column_values.nonnull.unexpected_count",
+              "metric_value_kwargs": null
+            },
+            "num_batches": 1
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "element_count": 528,
+        "partial_unexpected_counts": [],
+        "partial_unexpected_index_list": [],
+        "partial_unexpected_list": [],
+        "unexpected_count": 0,
+        "unexpected_percent": 0.0
+      },
+      "success": true
+    },
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_column_values_to_not_be_null",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "column": "rain"
+        },
+        "meta": {
+          "profiler_details": {
+            "metric_configuration": {
+              "domain_kwargs": {
+                "column": "rain"
+              },
+              "metric_name": "column_values.nonnull.unexpected_count",
+              "metric_value_kwargs": null
+            },
+            "num_batches": 1
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "element_count": 528,
+        "partial_unexpected_counts": [],
+        "partial_unexpected_index_list": [],
+        "partial_unexpected_list": [],
+        "unexpected_count": 0,
+        "unexpected_percent": 0.0
+      },
+      "success": true
+    },
+    {
+      "exception_info": {
+        "exception_message": null,
+        "exception_traceback": null,
+        "raised_exception": false
+      },
+      "expectation_config": {
+        "expectation_type": "expect_column_values_to_not_be_null",
+        "kwargs": {
+          "batch_id": "d3c6261609578adb370c0ddefa2b919b",
+          "column": "available_bike_stands"
+        },
+        "meta": {
+          "profiler_details": {
+            "metric_configuration": {
+              "domain_kwargs": {
+                "column": "available_bike_stands"
+              },
+              "metric_name": "column_values.nonnull.unexpected_count",
+              "metric_value_kwargs": null
+            },
+            "num_batches": 1
+          }
+        }
+      },
+      "meta": {},
+      "result": {
+        "element_count": 528,
+        "partial_unexpected_counts": [],
+        "partial_unexpected_index_list": [],
+        "partial_unexpected_list": [],
+        "unexpected_count": 0,
+        "unexpected_percent": 0.0
+      },
+      "success": true
+    }
+  ],
+  "statistics": {
+    "evaluated_expectations": 7,
+    "success_percent": 100.0,
+    "successful_expectations": 7,
+    "unsuccessful_expectations": 0
+  },
+  "success": true
+}
