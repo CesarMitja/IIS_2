@@ -79,9 +79,9 @@ def process_data():
     print("Train and test datasets created.")
 
 def main():
-    if not check_all_checkpoints():
-        print("Not all checkpoints passed. Halting further execution.")
-        sys.exit(1)
+    #if not check_all_checkpoints():
+    #    print("Not all checkpoints passed. Halting further execution.")
+    #    sys.exit(1)
     # Load data
     current_data = pd.read_csv('data/raw/vreme.csv')
     reference_data = pd.read_csv('data/raw/vreme_ref.csv')

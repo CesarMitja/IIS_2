@@ -63,8 +63,6 @@ jobs:
           dvc pull -r origin data/raw/kolesa.csv
           dvc pull -r origin data/raw/vreme.csv
           dvc pull -r origin data/processed/data_for_prediction.csv
-          dvc pull -r origin data/processed/test.csv
-          dvc pull -r origin data/processed/train.csv
       - name: Copy data
         id: copy
         if: steps.config.outcome == 'success'
