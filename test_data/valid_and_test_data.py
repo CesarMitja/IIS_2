@@ -34,7 +34,7 @@ def run_checkpoint(checkpoint_name):
 def check_all_checkpoints():
     """ Run all checkpoints and return False if any of them fail """
     x = 0
-    checkpoints = ["kolesa_check"]#["kolesa_check","vreme_check","pred_check"]
+    checkpoints = ["kolesa_check","vreme_check","pred_check"]
     for checkpoint in checkpoints:
         try:
             x = x + 1
@@ -79,10 +79,10 @@ def process_data():
     print("Train and test datasets created.")
 
 def main():
-    #if not check_all_checkpoints():
-    #    print("Not all checkpoints passed. Halting further execution.")
-    #    sys.exit(1)
-    # Load data
+    if not check_all_checkpoints():
+        print("Not all checkpoints passed. Halting further execution.")
+        sys.exit(1)
+    #Load data
     current_data = pd.read_csv('data/raw/vreme.csv')
     reference_data = pd.read_csv('data/raw/vreme_ref.csv')
     evidently_test(current_data, reference_data, "data_drift_vreme.html")

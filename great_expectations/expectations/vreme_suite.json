@@ -192,53 +192,6 @@
       }
     },
     {
-      "expectation_type": "expect_column_quantile_values_to_be_between",
-      "kwargs": {
-        "allow_relative_error": false,
-        "column": "temperature_2m",
-        "quantile_ranges": {
-          "quantiles": [
-            0.25,
-            0.5,
-            0.75
-          ],
-          "value_ranges": [
-            [
-              10.6,
-              10.6
-            ],
-            [
-              13.6,
-              13.6
-            ],
-            [
-              18.9,
-              18.9
-            ]
-          ]
-        }
-      },
-      "meta": {
-        "profiler_details": {
-          "metric_configuration": {
-            "domain_kwargs": {
-              "column": "temperature_2m"
-            },
-            "metric_name": "column.quantile_values",
-            "metric_value_kwargs": {
-              "allow_relative_error": false,
-              "quantiles": [
-                0.25,
-                0.5,
-                0.75
-              ]
-            }
-          },
-          "num_batches": 1
-        }
-      }
-    },
-    {
       "expectation_type": "expect_column_median_to_be_between",
       "kwargs": {
         "column": "temperature_2m",

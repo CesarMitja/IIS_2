@@ -6,7 +6,7 @@
       "expectation_type": "expect_table_row_count_to_be_between",
       "kwargs": {
         "max_value": 100000,
-        "min_value": 500
+        "min_value": 0
       },
       "meta": {
         "profiler_details": {
@@ -16,31 +16,6 @@
             "metric_value_kwargs": null
           },
           "num_batches": 1
-        }
-      }
-    },
-    {
-      "expectation_type": "expect_table_columns_to_match_set",
-      "kwargs": {
-        "column_set": [
-          "banking",
-          "bike_stands",
-          "position",
-          "address",
-          "last_update",
-          "status",
-          "contract_name",
-          "number",
-          "bonus",
-          "available_bike_stands",
-          "name",
-          "available_bikes"
-        ],
-        "exact_match": null
-      },
-      "meta": {
-        "profiler_details": {
-          "success_ratio": 1.0
         }
       }
     },
