@@ -15,15 +15,15 @@ import dagshub
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import cross_origin
-
+import subprocess
 app = Flask(__name__)
 
 
 CONNECTION_STRING = "mongodb+srv://cesi:Hondacbr125.@ptscluster.gkdlocr.mongodb.net/?retryWrites=true&appName=PTScluster"
 client = pymongo.MongoClient(CONNECTION_STRING)
-# Connect to the database
+
 db = client.IIS
-# Assuming you have a collection named 'predictions'
+
 predictions_collection = db.iis2
 actual_collection = db.iis2_a
 
@@ -43,15 +43,17 @@ model_name = "Bike_Stand_Prediction_Model_ONNX"
 latest_version = mlflow_client.get_latest_versions(model_name)[0]
 
 
+def update_data():
+    subprocess.run(['dvc', 'pull', '-r','origin', 'data/data_for_prediction.csv'], capture_output=True, text=True)
 
 
-# Function to download and load the ONNX model
+
 def load_model(run_id, artifact_path):
     local_model_path = mlflow.artifacts.download_artifacts(artifact_uri=f"runs:/{run_id}/{artifact_path}")
     ort_session = ort.InferenceSession(local_model_path)
     return ort_session
 
-# Function to download and load the scaler
+
 def load_scaler(run_id, artifact_path):
     local_scaler_path = mlflow.artifacts.download_artifacts(artifact_uri=f"runs:/{run_id}/{artifact_path}")
     return joblib.load(local_scaler_path)
@@ -59,17 +61,28 @@ def load_scaler(run_id, artifact_path):
 model = load_model(latest_version.run_id, "model/model.onnx")
 scaler = load_scaler(latest_version.run_id, "model/scaler.pkl")
 
-features = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 
+features = ['date','temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 
             'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands']
+
+
+features1 = ['temperature', 'relative_humidity', 'dew_point', 'apparent_temperature', 'precipitation_probability', 'rain', 'surface_pressure', 'bike_stands', 'available_bike_stands', 'hour', 'day_of_week', 'month']
 
 base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 csv_file_path = os.path.join(base_dir, 'data', 'processed', 'data_for_prediction.csv')
 
 def make_prediction(input_data):
-    # First transform the input data using the scaler
+    print("make 1")
+    input_data['date'] = pd.to_datetime(input_data['date'])
+    print("make 2")
+    for df in [input_data ]:
+        df['hour'] = df['date'].dt.hour
+        df['day_of_week'] = df['date'].dt.dayofweek
+        df['month'] = df['date'].dt.month
+    print("make 3")
+    input_data.pop('date')
     input_data = scaler.transform(input_data)
 
-    input_tensor = np.array(input_data, dtype=np.float32).reshape(1, -1, len(features))  
+    input_tensor = np.array(input_data, dtype=np.float32).reshape(1, -1, len(features1))  
 
     ort_inputs = {model.get_inputs()[0].name: input_tensor}
     ort_outs = model.run(None, ort_inputs)
@@ -77,21 +90,27 @@ def make_prediction(input_data):
     return ort_outs[0].flatten()
 
 def load_last_72_rows(csv_file_path):
+    print("72 prvi")
     df = pd.read_csv(csv_file_path)
     df = df[features]
     if len(df) >= 72:
         df = df.tail(72)
+        print("72 notri")
     else:
         raise ValueError("Not enough data. Need at least 72 rows.")
     return df
 
 
 @app.route('/predict', methods=['POST'])
-@cross_origin(origin='*')  # Adjust as needed
+@cross_origin(origin='*')  
 def predict():
     try:
+        update_data()
+        print("prvi")
         input_data = load_last_72_rows(csv_file_path)
+        print("drugi")
         predictions = make_prediction(input_data)
+        print("tretji")
         results = {"predictions": predictions.tolist()}
         return jsonify(results)
     except Exception as e:
@@ -101,46 +120,57 @@ def predict():
 
 def predict1():
     try:
+        update_data()
         input_data = load_last_72_rows(csv_file_path)
         predictions = make_prediction(input_data)
-        results = {"predictions": predictions.tolist()}
         doc = {
             "timestamp": datetime.datetime.utcnow(),
             "predictions": predictions.tolist()}
         predictions_collection.insert_one(doc)
-        return jsonify(results)
+        return True
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return False
     
 def calculate_metrics():
     yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     start_of_day = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
     end_of_day = yesterday.replace(hour=23, minute=59, second=59, microsecond=999)
-    
-    records = db.iis2.find = {
+
+    predictions_records = list(db.iis2.find({
         "timestamp": {"$gte": start_of_day, "$lt": end_of_day}
-    }
-    records2 = db.iis2_a.find = {
+    }))
+    actuals_records = list(db.iis2_a.find({
         "timestamp": {"$gte": start_of_day, "$lt": end_of_day}
-    }    
-    predictions = []
-    actuals = []
-    
-    for record in records:
-        predictions.append(record['predictions'][0])
-    for record1 in records2:
-        actuals.append(record1['actual'])
-    predictions = np.array(predictions)
-    actuals = np.array(actuals)
-    
-    if len(actuals) > 0 and len(predictions) > 0:
-        mse = mean_squared_error(actuals, predictions)
-        print(f"Calculated MSE for {yesterday.strftime('%Y-%m-%d')}: {mse}")
+    }))
+
+    # Preparing data containers
+    actuals = {record['timestamp'].replace(minute=0, second=0, microsecond=0): record['actual']
+            for record in actuals_records}
+
+    # Calculate MSE for each set of predictions
+    for record in predictions_records:
+        base_time = record['timestamp']
+        if isinstance(base_time, int):  # Convert from UNIX timestamp if necessary
+            base_time = datetime.datetime.utcfromtimestamp(base_time / 1000)
+        base_time = base_time.replace(minute=0, second=0, microsecond=0)
+        
+        prediction_values = [pred for pred in record['predictions']]
+        mse_values = []
         
         with mlflow.start_run():
-            mlflow.log_metric("daily_mse", mse)
-    else:
-        print("No sufficient data for metric calculation.")
+            for i, prediction in enumerate(prediction_values):
+                pred_time = base_time + datetime.timedelta(hours=i)
+                if pred_time in actuals:
+                    mse = mean_squared_error([prediction], [actuals[pred_time]])
+                    mse_values.append(mse)
+                    mlflow.log_metric(f'prediction_{base_time.hour:02d}_{i}_mse', mse)
+            
+            if mse_values:
+                avg_mse = np.mean(mse_values)
+                mlflow.log_metric(f'prediction_{base_time.hour:02d}_avg_mse', avg_mse)
+                print(f"Average MSE for predictions starting at {base_time.hour:02d}:00: {avg_mse}")
+            else:
+                print(f"No matching actual data for predictions starting at {base_time.hour:02d}:00.")
 
 def save_data():
     API_URL = "https://api.jcdecaux.com/vls/v1/stations?contract=maribor&apiKey=5e150537116dbc1786ce5bec6975a8603286526b"
@@ -166,7 +196,7 @@ def save_data():
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=calculate_metrics, trigger='cron', hour=0)
 scheduler.add_job(func=predict1, trigger='cron', minute=0)
-scheduler.add_job(func=save_data, trigger='cron', minute=0)
+scheduler.add_job(func=save_data)
 scheduler.start()
 
 if __name__ == '__main__':
