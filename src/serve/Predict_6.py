@@ -196,7 +196,7 @@ def save_data():
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=calculate_metrics, trigger='cron', hour=0)
 scheduler.add_job(func=predict1, trigger='cron', minute=0)
-scheduler.add_job(func=save_data)
+scheduler.add_job(func=save_data, trigger='cron', minute=0)
 scheduler.start()
 
 if __name__ == '__main__':
