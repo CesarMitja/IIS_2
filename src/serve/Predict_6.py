@@ -94,7 +94,7 @@ def load_last_72_rows(csv_file_path):
     df = pd.read_csv(csv_file_path)
     df = df[features]
     if len(df) >= 72:
-        df = df.tail(72)
+        df = df.tail(24)
         print("72 notri")
     else:
         raise ValueError("Not enough data. Need at least 72 rows.")
