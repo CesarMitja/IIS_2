@@ -43,9 +43,6 @@ model_name = "Bike_Stand_Prediction_Model_ONNX"
 latest_version = mlflow_client.get_latest_versions(model_name)[0]
 
 
-def update_data():
-    subprocess.run(['dvc', 'pull', '-r','origin', 'data/data_for_prediction.csv'], capture_output=True, text=True)
-
 
 
 def load_model(run_id, artifact_path):
@@ -105,7 +102,6 @@ def load_last_72_rows(csv_file_path):
 @cross_origin(origin='*')  
 def predict():
     try:
-        update_data()
         print("prvi")
         input_data = load_last_72_rows(csv_file_path)
         print("drugi")
@@ -120,7 +116,6 @@ def predict():
 
 def predict1():
     try:
-        update_data()
         input_data = load_last_72_rows(csv_file_path)
         predictions = make_prediction(input_data)
         doc = {

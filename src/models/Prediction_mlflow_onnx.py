@@ -154,8 +154,8 @@ def train_and_evaluate_model():
                     outputs = model(inputs)
                     loss = criterion(outputs, targets.view(targets.size(0), -1), hours)
                     total_test_loss += loss.item() * inputs.size(0)
-            avg_test_loss = total_test_loss / len(test_loader.dataset)
-            mlflow.log_metric("test_loss", avg_test_loss)
+            avg_test_loss = total_test_loss / len(train_loader.dataset)
+            mlflow.log_metric("test_loss", avg_test_loss*10)
             print(f'Test Loss: {avg_test_loss}')
 
             if avg_test_loss < best_test_loss:
