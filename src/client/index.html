@@ -122,7 +122,7 @@
                 let hours = futureTime.getHours();
                 let minutes = futureTime.getMinutes();
                 let timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-                html += `<tr><td>${timeString}</td><td>${prediction.toFixed(0)+3 - 1.5 * x}</td></tr>`;
+                html += `<tr><td>${timeString}</td><td>${(prediction.toFixed(0) - 1.6 * x).toFixed(0)}</td></tr>`;
                 x++;
             });
             html += '</table>';
