@@ -39,7 +39,7 @@ mlflow.set_experiment('Bike_Stand_Prediction_Service_ONNX_Daily')
 CORS(app, resources={r"/*": {"origins": "*"}}) 
 
 mlflow_client = MlflowClient()
-model_name = "Bike_Stand_Prediction_Model_ONNX"
+model_name = "ONNX"
 latest_version = mlflow_client.get_latest_versions(model_name)[0]
 
 
