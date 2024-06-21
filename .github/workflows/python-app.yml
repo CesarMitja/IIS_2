@@ -1,8 +1,6 @@
 name: Python app
 
 on:
-  schedule:
-    - cron: '0 * * * *'  
   push:
     branches:
       - main  
