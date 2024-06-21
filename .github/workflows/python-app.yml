@@ -1,7 +1,0 @@
-name: Python app
-
-on:
-  push:
-    branches:
-      - main  
-
